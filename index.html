@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"> <!-- Character encoding for the page -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Makes the page responsive on mobile devices -->
+    <title>Expense Tracker - Login/Register</title> <!-- Title of the page -->
+
+    <link rel="stylesheet" href="assets/css/index.css"> <!-- Linking the external CSS stylesheet for styling -->
+</head>
+<body>
+    <!-- Toast notification container, used for displaying success/error messages -->
+    <div id="toast" class="toast"></div>
+
+    <main class="container">
+        <!-- Left panel: Contains brand information and feature list -->
+        <section class="left-panel">
+            <div class="brand">
+                <h1>Expense Tracker</h1> <!-- Brand Name -->
+                <p>Your Personal Finance Companion</p> <!-- Tagline for the application -->
+            </div>
+
+            <!-- Feature list: Displays key features of the app with animations -->
+            <div class="feature-list">
+                <!-- Individual feature items -->
+                <div class="feature-item" style="animation-delay: 0.2s">
+                    <i>📊</i> <!-- Icon for Track Expenses -->
+                    <div>
+                        <h3>Track Expenses</h3> <!-- Feature title -->
+                        <p>Monitor your spending habits easily</p> <!-- Feature description -->
+                    </div>
+                </div>
+                <div class="feature-item" style="animation-delay: 0.4s">
+                    <i>💰</i> <!-- Icon for Budget Planning -->
+                    <div>
+                        <h3>Budget Planning</h3> <!-- Feature title -->
+                        <p>Set and achieve financial goals</p> <!-- Feature description -->
+                    </div>
+                </div>
+                <div class="feature-item" style="animation-delay: 0.6s">
+                    <i>📱</i> <!-- Icon for Easy Access Anywhere-->
+                    <div>
+                        <h3>Easy Access Anywhere</h3> <!-- Feature title -->
+                        <p>Manage finances on the go</p> <!-- Feature description -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Right panel: Contains the login and register forms -->
+        <section class="right-panel">
+            <div class="form-container">
+                <!-- Tab buttons for switching between login and register forms -->
+                <div class="tab-buttons">
+                    <button class="tab-btn active" onclick="switchTab('login')">Login</button> <!-- Login tab button -->
+                    <button class="tab-btn" onclick="switchTab('register')">Register</button> <!-- Register tab button -->
+                </div>
+
+                <!-- Login form -->
+<form id="loginForm" method="POST" action="pages/login.php">
+    <div class="form-group">
+        <label for="loginEmail">Email</label>
+        <div class="input-wrapper">
+            <i>📧</i> 
+            <input type="email" id="loginEmail" name="email" class="form-control" required> 
+        </div>
+        <div class="error-message"></div>
+    </div>
+
+    <div class="form-group">
+        <label for="loginPassword">Password</label>
+        <div class="input-wrapper">
+            <i>🔒</i>
+            <input type="password" id="loginPassword" name="password" class="form-control" required>
+            <button type="button" class="password-toggle" onclick="togglePassword('loginPassword')">👁️</button>
+        </div>
+        <div class="error-message"></div>
+    </div>
+
+    <!-- Submit button for login (PHP handles the redirect) -->
+    <button type="submit" class="submit-btn">Sign In</button>
+
+    <!-- Social login options -->
+    <div class="social-login">
+        <div class="social-btn" onclick="socialLogin('google')">
+            <img src="api/placeholder" alt="Google">
+            Continue with Google
+        </div>
+        <div class="social-btn" onclick="socialLogin('microsoft')">
+            <img src="api/placeholder" alt="Microsoft">
+            Continue with Microsoft
+        </div>
+    </div>
+</form>
+
+                <!-- Register form -->
+<form id="registerForm" method="POST" action="pages/register.php" style="display: none;">
+    <div class="form-group">
+        <label for="regName">Full Name</label>
+        <div class="input-wrapper">
+            <i>👤</i> 
+            <input type="text" id="regName" name="name" class="form-control" required> 
+        </div>
+        <div class="error-message"></div>
+    </div>
+
+    <div class="form-group">
+        <label for="regEmail">Email</label>
+        <div class="input-wrapper">
+            <i>📧</i> 
+            <input type="email" id="regEmail" name="email" class="form-control" required> 
+        </div>
+        <div class="error-message"></div>
+    </div>
+
+    <div class="form-group">
+        <label for="regPassword">Password</label>
+        <div class="input-wrapper">
+            <i>🔒</i> 
+            <input type="password" id="regPassword" name="password" class="form-control" required>
+            <button type="button" class="password-toggle" onclick="togglePassword('regPassword')">👁️</button>
+        </div>
+        <div class="error-message"></div>
+        <div class="password-strength">
+            <div class="password-strength-bar"></div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="regConfirmPassword">Confirm Password</label>
+        <div class="input-wrapper">
+            <i>🔒</i>
+            <input type="password" id="regConfirmPassword" name="confirm_password" class="form-control" required>
+            <button type="button" class="password-toggle" onclick="togglePassword('regConfirmPassword')">👁️</button>
+        </div>
+        <div class="error-message"></div>
+    </div>
+
+    <!-- Submit button for registration -->
+    <button type="submit" class="submit-btn">Create Account</button>
+</form>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- External JavaScript file for form interactions and functionality -->
+    <script src="assets/js/index.js"></script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+expense-tracker/
+├── assets/
+│   ├── css/    (Stylesheets like `style.css`)
+│   ├── js/     (JavaScript files like `script.js`)
+│   ├── images/ (Logos, icons, etc.)
+├── includes/
+│   ├── db_connect.php (Database connection file)
+├── pages/
+│   ├── login.php         (User login page)
+│   ├── register.php      (User registration page)
+│   ├── add_expense.php   (Add new expense)
+│   ├── view_expenses.php (View expense history)
+│   ├── logout.php        (Logout functionality)
+├── models/
+│   ├── user.php     (Handles user-related database queries)
+│   ├── expense.php  (Handles expense-related database queries)
+├── config/
+│   ├── config.php  (App configuration and global settings)
+├── index.html      (Landing page / Login/Register)
+├── dashboard.php   (User dashboard)

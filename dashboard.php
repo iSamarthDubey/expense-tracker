@@ -1,0 +1,198 @@
+<?php
+session_start();
+include('includes/db_connect.php'); // Include database connection
+
+// Check if the user is logged in
+if (!isset($_SESSION['user'])) {
+    header('Location: index.html'); // Redirect to login page if not authenticated
+    exit();
+}
+
+$userId = $_SESSION['user'];
+
+// Fetch user data
+$stmt = $conn->prepare("SELECT name, email FROM users WHERE id = ?");
+$stmt->bind_param("i", $userId);
+$stmt->execute();
+$stmt->bind_result($name, $email);
+$stmt->fetch();
+$stmt->close();
+
+// Fetch user expenses
+$expenses = [];
+$expenseStmt = $conn->prepare("SELECT date, category, description, amount, status FROM expenses WHERE user_id = ? ORDER BY date DESC");
+$expenseStmt->bind_param("i", $userId);
+$expenseStmt->execute();
+$result = $expenseStmt->get_result();
+while ($row = $result->fetch_assoc()) {
+    $expenses[] = $row;
+}
+$expenseStmt->close();
+
+// Calculate summary data
+$totalExpenses = 0;
+$monthlyExpenses = 0;
+$pendingCount = 0;
+$categories = [];
+$currentMonth = date('Y-m');
+
+foreach ($expenses as $expense) {
+    $totalExpenses += $expense['amount'];
+    if (strpos($expense['date'], $currentMonth) === 0) {
+        $monthlyExpenses += $expense['amount'];
+    }
+    if ($expense['status'] === 'Pending') {
+        $pendingCount++;
+    }
+    if (!isset($categories[$expense['category']])) {
+        $categories[$expense['category']] = 0;
+    }
+    $categories[$expense['category']] += $expense['amount'];
+}
+
+$conn->close();
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker - Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/dashboard.css"> <!-- Linking the external CSS stylesheet for styling -->
+    
+</head>
+<body>
+    <div class="dashboard-layout">
+        
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h1 class="text-2xl font-bold mb-8">Expense Tracker</h1>
+            <div class="mb-8">
+                <div class="font-medium">Welcome, <?php echo htmlspecialchars($name); ?>!</div>
+                <div class="text-sm text-gray-400"><?php echo htmlspecialchars($email); ?></div>
+            </div>
+            <nav>
+                <a href="#" class="block mb-4 text-blue-400">Dashboard</a>
+                <a href="pages/logout.php" class="block mb-4 text-red-400">Logout</a>
+            </nav>
+        </aside>
+        
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <h2 class="text-2xl font-bold mb-6">Overview</h2>
+
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-4 gap-6 mb-8">
+                <div class="card">
+                    <div>Total Expenses</div>
+                    <div class="summary-value">$<?php echo number_format($totalExpenses, 2); ?></div>
+                </div>
+                <div class="card">
+                    <div>This Month</div>
+                    <div class="summary-value">$<?php echo number_format($monthlyExpenses, 2); ?></div>
+                </div>
+                <div class="card">
+                    <div>Pending</div>
+                    <div class="summary-value"><?php echo $pendingCount; ?></div>
+                </div>
+                <div class="card">
+                    <div>Categories</div>
+                    <div class="summary-value"><?php echo count($categories); ?></div>
+                </div>
+            </div>
+
+        <!-- Add Expense Button -->
+        <main class="main-content">
+            <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold">Your Expenses</h2>
+            <button class="btn btn-primary" onclick="showModal('addExpenseModal')"> Add Expense </button>
+        </div>    
+
+            <!-- Recent Expenses Table -->
+            <div class="card">
+                <h3 class="text-lg font-medium mb-4">Recent Expenses</h3>
+                <table class="table-auto w-full">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Category</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (empty($expenses)): ?>
+                            <tr>
+                                <td colspan="5" class="text-center">No expenses found.</td>
+                            </tr>
+                        <?php else: ?>
+                            <?php foreach ($expenses as $expense): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($expense['date']); ?></td>
+                                    <td><?php echo htmlspecialchars($expense['category']); ?></td>
+                                    <td><?php echo htmlspecialchars($expense['description']); ?></td>
+                                    <td>$<?php echo number_format($expense['amount'], 2); ?></td>
+                                    <td><span class="status-badge status-<?php echo strtolower($expense['status']); ?>"><?php echo htmlspecialchars($expense['status']); ?></span></td>
+                                </tr>
+                                
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+<!-- Replace the existing expense modal content with this -->
+    <div id="addExpenseModal" class="modal">
+    <div class="modal-content">
+        <h2 class="text-xl font-bold mb-4">Add New Expense</h2>
+        <!-- The form for adding a new expense -->
+        <form id="expenseForm" onsubmit="addExpense(event)">
+            <!-- Input field for selecting the expense date -->
+            <div class="form-group">
+                <label for="date">Date</label>
+                <input type="date" id="date" required>
+            </div>
+
+            <!-- Dropdown to select the expense category -->
+            <div class="form-group">
+                <label for="category">Category</label>
+                <select id="category" required>
+                    <option value="Travel">Travel</option>
+                    <option value="Office">Office</option>
+                    <option value="Meals">Meals</option>
+                    <option value="Utilities">Utilities</option>
+                    <option value="Others">Others</option>
+                </select>
+            </div>
+
+            <!-- Input field for providing a description of the expense -->
+            <div class="form-group">
+                <label for="description">Description</label>
+                <input type="text" id="description" required>
+            </div>
+
+            <!-- Input field for entering the expense amount -->
+            <div class="form-group">
+                <label for="amount">Amount</label>
+                <input type="number" id="amount" step="0.01" required>
+            </div>
+
+            <!-- Buttons to cancel or submit the form -->
+            <div class="flex justify-end gap-4">
+                <button type="button" class="btn" onclick="hideModal('addExpenseModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Add Expense</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+        <!-- External JavaScript file for form interactions and functionality -->
+        <script src="assets/js/dashboard.js"></script>
+</body>
+</html>
