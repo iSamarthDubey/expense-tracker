@@ -153,7 +153,7 @@ function deleteExpense(button) {
 }
 
 function changeStatus(button) {
-    const statuses = ['Pending', 'Approved', 'Rejected'];
+    const statuses = ['Planned', 'Approved', 'Unwanted'];
     const row = button.closest('tr');
     const statusBadge = row.querySelector('.status-badge');
     const currentStatus = statusBadge.textContent;
@@ -161,8 +161,8 @@ function changeStatus(button) {
     const newStatus = statuses[(currentIndex + 1) % statuses.length];
     
     // Update pending count
-    if (currentStatus === 'Pending') pendingCount--;
-    if (newStatus === 'Pending') pendingCount++;
+    if (currentStatus === 'Planned') pendingCount--;
+    if (newStatus === 'Planned') pendingCount++;
     
     // Update badge
     statusBadge.className = `status-badge status-${newStatus.toLowerCase()}`;
