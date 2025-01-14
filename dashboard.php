@@ -122,7 +122,8 @@ $conn->close();
                 <h2 class="text-2xl font-bold">Your Expenses</h2>
                 <button class="btn btn-primary" onclick="showModal('addExpenseModal')">Add Expense</button>
             </div>
-
+            
+            <!------ Expense Table ----->
             <!-- Recent Expenses Table -->
             <div class="card">
                 <h3 class="text-lg font-medium mb-4">Recent Expenses</h3>
@@ -144,15 +145,17 @@ $conn->close();
                             </tr>
                         <?php else: ?>
                             <?php foreach ($expenses as $expense): ?>
-                                <tr>
+                                
+                                <tr data-id="<?= $expense['id'] ?>">
                                     <td><?php echo htmlspecialchars($expense['date']); ?></td>
                                     <td><?php echo htmlspecialchars($expense['category']); ?></td>
                                     <td><?php echo htmlspecialchars($expense['description']); ?></td>
                                     <td>₹<?php echo number_format($expense['amount'], 2); ?></td>
                                     <td><span class="status-badge status-<?php echo strtolower($expense['status']); ?>"><?php echo htmlspecialchars($expense['status']); ?></span></td>
+                                    
                                     <td>
-                                        <!-- Edit Button -->
-                                        <button class="btn btn-secondary" onclick="editExpense(<?php echo htmlspecialchars(json_encode($expense)); ?>)">Edit</button>
+                                    <button class="text-blue-600 hover:text-blue-700" onclick="editExpense(this, '<?= $expense['id'] ?>')">Edit</button>
+                                    <button class="text-red-600 hover:text-red-700" onclick="deleteExpense(this)">Delete</button>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -162,6 +165,8 @@ $conn->close();
             </div>
         </main>
     </div>
+
+
 
     <!--- Modals (Add and Edit Expense) --->
     
