@@ -205,6 +205,16 @@ $conn->close();
                 <label for="amount">Amount</label>
                 <input type="number" id="amount" step="0.01" required>
             </div>
+            
+            <!-- Input field for entering the status -->
+            <div class="form-group">
+                <label for="status">Status</label>
+                <select id="status" required>
+                    <option value="Approved">Approved</option>
+                    <option value="Planned">Planned</option>
+                    <option value="Unwanted">Unwanted</option>
+                </select>
+            </div>
 
             <!-- Buttons to cancel or submit the form -->
             <div class="flex justify-end gap-4">
@@ -247,9 +257,9 @@ $conn->close();
             <div class="form-group">
                 <label for="editStatus">Status</label>
                 <select id="editStatus" required>
-                    <option value="Pending">Pending</option>
                     <option value="Approved">Approved</option>
-                    <option value="Rejected">Rejected</option>
+                    <option value="Planned">Planned</option>
+                    <option value="Unwanted">Unwanted</option>
                 </select>
             </div>
             <div class="flex justify-end gap-4">
