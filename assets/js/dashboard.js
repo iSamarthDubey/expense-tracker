@@ -5,11 +5,11 @@ let expenseChart, categoryChart;
 const chartData = {
     expenses: [10, 100, 1000, 10000, 10000],
     categories: {
-        'Travel': 400,
-        'Office': 600,
-        'Meals': 300,
-        'Utilities': 500,
-        'Others': 200
+        'Travel': 0,
+        'Office': 0,
+        'Meals': 0,
+        'Utilities': 0,
+        'Others': 0
     }
 };
 
@@ -18,7 +18,7 @@ function initializeCharts() {
     expenseChart = new Chart(trendCtx, {
         type: 'line',
         data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             datasets: [{
                 label: 'Expenses (₹)',
                 data: chartData.expenses,
