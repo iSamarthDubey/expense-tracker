@@ -20,7 +20,7 @@ $stmt->close();
 
 // Fetch user expenses
 $expenses = [];
-$expenseStmt = $conn->prepare("SELECT date, category, description, amount, status FROM expenses WHERE user_id = ? ORDER BY date DESC");
+$expenseStmt = $conn->prepare("SELECT id, date, category, description, amount, status FROM expenses WHERE user_id = ? ORDER BY date DESC"); // Note: Added 'id' for editing
 $expenseStmt->bind_param("i", $userId);
 $expenseStmt->execute();
 $result = $expenseStmt->get_result();
@@ -61,11 +61,9 @@ $conn->close();
     <title>Expense Tracker - Dashboard</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/dashboard.css"> <!-- Linking the external CSS stylesheet for styling -->
-    
 </head>
 <body>
     <div class="dashboard-layout">
-        
         <!-- Sidebar -->
         <aside class="sidebar">
             <h1 class="text-2xl font-bold mb-8">Expense Tracker</h1>
@@ -78,7 +76,6 @@ $conn->close();
                 <a href="pages/logout.php" class="block mb-4 text-red-400">Logout</a>
             </nav>
         </aside>
-        
 
         <!-- Main Content -->
         <main class="main-content">
@@ -104,12 +101,11 @@ $conn->close();
                 </div>
             </div>
 
-        <!-- Add Expense Button -->
-        <main class="main-content">
+            <!-- Add Expense Button -->
             <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold">Your Expenses</h2>
-            <button class="btn btn-primary" onclick="showModal('addExpenseModal')"> Add Expense </button>
-        </div>    
+                <h2 class="text-2xl font-bold">Your Expenses</h2>
+                <button class="btn btn-primary" onclick="showModal('addExpenseModal')">Add Expense</button>
+            </div>
 
             <!-- Recent Expenses Table -->
             <div class="card">
@@ -122,12 +118,13 @@ $conn->close();
                             <th>Description</th>
                             <th>Amount</th>
                             <th>Status</th>
+                            <th>Actions</th> <!-- Added Actions column -->
                         </tr>
                     </thead>
                     <tbody>
                         <?php if (empty($expenses)): ?>
                             <tr>
-                                <td colspan="5" class="text-center">No expenses found.</td>
+                                <td colspan="6" class="text-center">No expenses found.</td>
                             </tr>
                         <?php else: ?>
                             <?php foreach ($expenses as $expense): ?>
@@ -137,8 +134,11 @@ $conn->close();
                                     <td><?php echo htmlspecialchars($expense['description']); ?></td>
                                     <td>$<?php echo number_format($expense['amount'], 2); ?></td>
                                     <td><span class="status-badge status-<?php echo strtolower($expense['status']); ?>"><?php echo htmlspecialchars($expense['status']); ?></span></td>
+                                    <td>
+                                        <!-- Edit Button -->
+                                        <button class="btn btn-secondary" onclick="editExpense(<?php echo htmlspecialchars(json_encode($expense)); ?>)">Edit</button>
+                                    </td>
                                 </tr>
-                                
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </tbody>
@@ -147,7 +147,9 @@ $conn->close();
         </main>
     </div>
 
-<!-- Replace the existing expense modal content with this -->
+    <!--- Modals (Add and Edit Expense) --->
+    
+    <!-- Add Modal: Same as your version -->
     <div id="addExpenseModal" class="modal">
     <div class="modal-content">
         <h2 class="text-xl font-bold mb-4">Add New Expense</h2>
@@ -192,7 +194,52 @@ $conn->close();
     </div>
 </div>
 
-        <!-- External JavaScript file for form interactions and functionality -->
-        <script src="assets/js/dashboard.js"></script>
+    <!-- Edit Modal: Same as your version -->
+    <div id="editExpenseModal" class="modal">
+    <div class="modal-content">
+        <h2 class="text-xl font-bold mb-4">Edit Expense</h2>
+        <!-- Edit Expense Form -->
+        <form id="editExpenseForm" onsubmit="updateExpense(event)">
+            <input type="hidden" id="editExpenseId"> <!-- Hidden field for expense ID -->
+            <div class="form-group">
+                <label for="editDate">Date</label>
+                <input type="date" id="editDate" required>
+            </div>
+            <div class="form-group">
+                <label for="editCategory">Category</label>
+                <select id="editCategory" required>
+                    <option value="Travel">Travel</option>
+                    <option value="Office">Office</option>
+                    <option value="Meals">Meals</option>
+                    <option value="Utilities">Utilities</option>
+                    <option value="Others">Others</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="editDescription">Description</label>
+                <input type="text" id="editDescription" required>
+            </div>
+            <div class="form-group">
+                <label for="editAmount">Amount</label>
+                <input type="number" id="editAmount" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label for="editStatus">Status</label>
+                <select id="editStatus" required>
+                    <option value="Pending">Pending</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Rejected">Rejected</option>
+                </select>
+            </div>
+            <div class="flex justify-end gap-4">
+                <button type="button" class="btn" onclick="hideModal('editExpenseModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Update Expense</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+    <!-- External JavaScript file for form interactions and functionality -->
+    <script src="assets/js/dashboard.js"></script>
 </body>
 </html>
