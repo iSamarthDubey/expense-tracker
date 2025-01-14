@@ -5,11 +5,11 @@ let expenseChart, categoryChart;
 const chartData = {
     expenses: [10, 100, 1000, 10000, 10000],
     categories: {
-        'Travel': 0,
-        'Office': 0,
-        'Meals': 0,
-        'Utilities': 0,
-        'Others': 0
+        'Travel': 10,
+        'Office': 10,
+        'Meals': 10,
+        'Utilities': 10,
+        'Others': 10
     }
 };
 
