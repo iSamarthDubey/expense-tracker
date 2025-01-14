@@ -3,7 +3,7 @@ let expenseChart, categoryChart;
 
 // Initialize data
 const chartData = {
-    expenses: [1200, 1500, 1000, 2000, 1800, 2400],
+    expenses: [10, 100, 1000, 10000, 10000],
     categories: {
         'Travel': 400,
         'Office': 600,
@@ -20,7 +20,7 @@ function initializeCharts() {
         data: {
             labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
             datasets: [{
-                label: 'Expenses ($)',
+                label: 'Expenses (₹)',
                 data: chartData.expenses,
                 borderColor: 'rgba(37, 99, 235, 0.7)',
                 backgroundColor: 'rgba(37, 99, 235, 0.1)',
