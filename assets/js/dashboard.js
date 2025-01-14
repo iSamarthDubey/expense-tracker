@@ -60,57 +60,73 @@ function updateCharts(amount, category) {
     categoryChart.update();
 }
 
-function addExpense(event) {
-    event.preventDefault();
-    
+async function addExpense(event) {
+    event.preventDefault(); // Prevent the form from submitting normally (page reload)
+
+    // Collect the form data
     const formData = {
-        date: document.getElementById('date').value,
-        category: document.getElementById('category').value,
-        description: document.getElementById('description').value,
-        amount: parseFloat(document.getElementById('amount').value)
+        date: document.getElementById('date').value, // Selected expense date
+        category: document.getElementById('category').value, // Selected category
+        description: document.getElementById('description').value, // Expense description
+        amount: parseFloat(document.getElementById('amount').value) // Expense amount as a number
     };
 
-    // Update stats
-    totalExpenses += formData.amount;
-    monthlyExpenses += formData.amount;
-    pendingCount++;
-    updateStats();
+    // Send the data to the backend using a POST request
+    try {
+        const response = await fetch('pages/add_expense.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, // Set the content type
+            body: new URLSearchParams(formData) // Convert form data to URL-encoded format
+        });
 
-    // Add to expenses array
-    expenses.push(formData);
+        // Parse the JSON response from the backend
+        const result = await response.json();
 
-    // Add to table
-    const tableBody = document.querySelector('.data-table tbody');
-    const row = `
-        <tr>
-            <td>${formData.date}</td>
-            <td>${formData.category}</td>
-            <td>${formData.description}</td>
-            <td>$${formData.amount.toFixed(2)}</td>
-            <td><span class="status-badge status-pending" onclick="changeStatus(this)">Pending</span></td>
-            <td>
-                <button class="text-blue-600 hover:text-blue-700" onclick="editExpense(this)">Edit</button>
-                <button class="text-red-600 hover:text-red-700" onclick="deleteExpense(this)">Delete</button>
-            </td>
-        </tr>
-    `;
-    tableBody.insertAdjacentHTML('afterbegin', row);
+        if (result.success) {
+            // Display a success toast notification
+            showToast(result.success, 'success');
 
-    // Update charts
-    updateCharts(formData.amount, formData.category);
+            // Add the new expense to the expense table dynamically
+            const tableBody = document.querySelector('.data-table tbody');
+            const row = `
+                <tr>
+                    <td>${formData.date}</td>
+                    <td>${formData.category}</td>
+                    <td>${formData.description}</td>
+                    <td>₹${formData.amount.toFixed(2)}</td>
+                    <td><span class="status-badge status-pending">Pending</span></td>
+                    <td>
+                        <!-- Add buttons for editing and deleting the expense -->
+                        <button class="text-blue-600 hover:text-blue-700" onclick="editExpense(this)">Edit</button>
+                        <button class="text-red-600 hover:text-red-700" onclick="deleteExpense(this)">Delete</button>
+                    </td>
+                </tr>
+            `;
+            tableBody.insertAdjacentHTML('afterbegin', row); // Insert the row at the beginning of the table
 
-    // Reset form and hide modal
-    document.getElementById('expenseForm').reset();
-    hideModal('addExpenseModal');
+            // Update stats and charts
+            totalExpenses += formData.amount; // Update total expenses
+            monthlyExpenses += formData.amount; // Update monthly expenses
+            pendingCount++; // Increase the count of pending expenses
+            updateStats(); // Refresh summary stats
+            updateCharts(formData.amount, formData.category); // Update the charts
+
+            // Reset the form and close the modal
+            document.getElementById('expenseForm').reset();
+            hideModal('addExpenseModal');
+        } else {
+            // Display an error toast notification if the backend returns an error
+            showToast(result.error, 'error');
+        }
+    } catch (error) {
+        // Handle any network or backend errors
+        showToast('Failed to add expense. Please try again.', 'error');
+    }
 }
-
-let totalExpenses = 15489; // Initial value
-let monthlyExpenses = 3240; // Initial value
-let pendingCount = 12; // Initial value
 
 function deleteExpense(button) {
     const row = button.closest('tr');
-    const amount = parseFloat(row.querySelector('td:nth-child(4)').textContent.replace('$', ''));
+    const amount = parseFloat(row.querySelector('td:nth-child(4)').textContent.replace('₹', ''));
     const category = row.querySelector('td:nth-child(2)').textContent;
     const status = row.querySelector('.status-badge').textContent;
 
@@ -178,94 +194,6 @@ function setActiveNav(element, sectionId) {
     element.classList.add('active');
 }
 
-// Add click handlers to existing table rows
-document.addEventListener('DOMContentLoaded', function() {
-    const existingRows = document.querySelectorAll('.data-table tbody tr');
-    existingRows.forEach(row => {
-        const deleteBtn = row.querySelector('td:last-child button:last-child');
-        if (deleteBtn) {
-            deleteBtn.onclick = () => deleteExpense(deleteBtn);
-        }
-        const statusBadge = row.querySelector('.status-badge');
-        if (statusBadge) {
-            statusBadge.onclick = () => changeStatus(statusBadge);
-        }
-    });
-    
-    initializeCharts();
-    updateStats();
-});
-
-
-/**
- * Handles the submission of the Add Expense form.
- * Sends the expense data to the backend and dynamically updates the dashboard.
- */
-async function addExpense(event) {
-    event.preventDefault(); // Prevent the form from submitting normally (page reload)
-
-    // Collect the form data
-    const formData = {
-        date: document.getElementById('date').value, // Selected expense date
-        category: document.getElementById('category').value, // Selected category
-        description: document.getElementById('description').value, // Expense description
-        amount: parseFloat(document.getElementById('amount').value) // Expense amount as a number
-    };
-
-    // Send the data to the backend using a POST request
-    try {
-        const response = await fetch('pages/add_expense.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, // Set the content type
-            body: new URLSearchParams(formData) // Convert form data to URL-encoded format
-        });
-
-        // Parse the JSON response from the backend
-        const result = await response.json();
-
-        if (result.success) {
-            // Display a success toast notification
-            showToast(result.success, 'success');
-
-            // Add the new expense to the expense table dynamically
-            const tableBody = document.querySelector('.data-table tbody');
-            const row = `
-                <tr>
-                    <td>${formData.date}</td>
-                    <td>${formData.category}</td>
-                    <td>${formData.description}</td>
-                    <td>$${formData.amount.toFixed(2)}</td>
-                    <td><span class="status-badge status-pending">Pending</span></td>
-                    <td>
-                        <!-- Add buttons for editing and deleting the expense -->
-                        <button class="text-blue-600 hover:text-blue-700" onclick="editExpense(this)">Edit</button>
-                        <button class="text-red-600 hover:text-red-700" onclick="deleteExpense(this)">Delete</button>
-                    </td>
-                </tr>
-            `;
-            tableBody.insertAdjacentHTML('afterbegin', row); // Insert the row at the beginning of the table
-
-            // Update stats and charts
-            totalExpenses += formData.amount; // Update total expenses
-            monthlyExpenses += formData.amount; // Update monthly expenses
-            pendingCount++; // Increase the count of pending expenses
-            updateStats(); // Refresh summary stats
-            updateCharts(formData.amount, formData.category); // Update the charts
-
-            // Reset the form and close the modal
-            document.getElementById('expenseForm').reset();
-            hideModal('addExpenseModal');
-        } else {
-            // Display an error toast notification if the backend returns an error
-            showToast(result.error, 'error');
-        }
-    } catch (error) {
-        // Handle any network or backend errors
-        showToast('Failed to add expense. Please try again.', 'error');
-    }
-}
-
-
 /**
  * Opens the Edit Expense modal and pre-fills the fields with the selected expense data.
  * @param {HTMLElement} button - The Edit button clicked.
@@ -329,7 +257,7 @@ async function submitEditExpense(event) {
                     row.children[0].textContent = formData.date; // Update the date
                     row.children[1].textContent = formData.category; // Update the category
                     row.children[2].textContent = formData.description; // Update the description
-                    row.children[3].textContent = `$${formData.amount.toFixed(2)}`; // Update the amount
+                    row.children[3].textContent = `₹${formData.amount.toFixed(2)}`; // Update the amount
                 }
             });
 
@@ -349,6 +277,23 @@ async function submitEditExpense(event) {
     }
 }
 
+// Add click handlers to existing table rows
+document.addEventListener('DOMContentLoaded', function() {
+    const existingRows = document.querySelectorAll('.data-table tbody tr');
+    existingRows.forEach(row => {
+        const deleteBtn = row.querySelector('td:last-child button:last-child');
+        if (deleteBtn) {
+            deleteBtn.onclick = () => deleteExpense(deleteBtn);
+        }
+        const statusBadge = row.querySelector('.status-badge');
+        if (statusBadge) {
+            statusBadge.onclick = () => changeStatus(statusBadge);
+        }
+    });
+    
+    initializeCharts();
+    updateStats();
+});
 
 // Function to fetch and update Overview Cards dynamically
 async function loadOverviewData() {

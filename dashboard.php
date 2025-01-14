@@ -85,11 +85,11 @@ $conn->close();
             <div class="grid grid-cols-4 gap-6 mb-8">
                 <div class="card">
                     <div>Total Expenses</div>
-                    <div class="summary-value">$<?php echo number_format($totalExpenses, 2); ?></div>
+                    <div class="summary-value">₹<?php echo number_format($totalExpenses, 2); ?></div>
                 </div>
                 <div class="card">
                     <div>This Month</div>
-                    <div class="summary-value">$<?php echo number_format($monthlyExpenses, 2); ?></div>
+                    <div class="summary-value">₹<?php echo number_format($monthlyExpenses, 2); ?></div>
                 </div>
                 <div class="card">
                     <div>Pending</div>
@@ -98,6 +98,22 @@ $conn->close();
                 <div class="card">
                     <div>Categories</div>
                     <div class="summary-value"><?php echo count($categories); ?></div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="grid grid-cols-2 gap-6 mb-8">
+                <div class="card">
+                    <h3 class="text-lg font-medium mb-4">Expense Trend</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3 class="text-lg font-medium mb-4">Category Distribution</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
                 </div>
             </div>
 
@@ -132,7 +148,7 @@ $conn->close();
                                     <td><?php echo htmlspecialchars($expense['date']); ?></td>
                                     <td><?php echo htmlspecialchars($expense['category']); ?></td>
                                     <td><?php echo htmlspecialchars($expense['description']); ?></td>
-                                    <td>$<?php echo number_format($expense['amount'], 2); ?></td>
+                                    <td>₹<?php echo number_format($expense['amount'], 2); ?></td>
                                     <td><span class="status-badge status-<?php echo strtolower($expense['status']); ?>"><?php echo htmlspecialchars($expense['status']); ?></span></td>
                                     <td>
                                         <!-- Edit Button -->
@@ -239,7 +255,9 @@ $conn->close();
     </div>
 </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- External JavaScript file for form interactions and functionality -->
     <script src="assets/js/dashboard.js"></script>
+
 </body>
 </html>
