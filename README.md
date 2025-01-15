@@ -1,6 +1,6 @@
 # Expense Tracker (expense-tracker)
 
-A simple web app to keep a track of expenses. Built using HTML, CSS, Javascript, PHP and MySQL. It allows users to sign up, log in, and manage their expenses data efficiently.
+A simple web app to keep a track of expenses. Built using HTML, CSS, Javascript, PHP and MySQL(for databases). It allows users to sign up, log in, and manage their expenses data efficiently.
 
 ---
 
