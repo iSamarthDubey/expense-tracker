@@ -41,8 +41,8 @@ foreach ($expenses as $expense) {
     if (strpos($expense['date'], $currentMonth) === 0) {
         $monthlyExpenses += $expense['amount'];
     }
-    if ($expense['status'] === 'Pending') {
-        $pendingCount++;
+    if ($expense['status'] === 'Planned') {
+        $plannedCount++;
     }
     if (!isset($categories[$expense['category']])) {
         $categories[$expense['category']] = 0;
@@ -92,8 +92,8 @@ $conn->close();
                     <div class="summary-value">₹<?php echo number_format($monthlyExpenses, 2); ?></div>
                 </div>
                 <div class="card">
-                    <div>Pending</div>
-                    <div class="summary-value"><?php echo $pendingCount; ?></div>
+                    <div>Planned</div>
+                    <div class="summary-value"><?php echo $plannedCount; ?></div>
                 </div>
                 <div class="card">
                     <div>Categories</div>
