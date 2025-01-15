@@ -18,27 +18,6 @@
     padding: 2rem;
 }
 
-/* Sidebar */
-.sidebar {
-    position: fixed; /* This keeps it in place while scrolling */
-    top: 0;         /* Aligns it to the top of the page */
-    left: 0;        /* Aligns it to the left of the page */
-    height: 100vh;  /* Ensures the sidebar spans the full height of the viewport */
-    width: 250px;   /* Set the width of the sidebar */
-    background-color: #1a202c; /* Set a background color */
-    color: white;   /* Text color */
-    padding: 20px;  /* Add padding inside the sidebar */
-    overflow-y: auto; /* Optional: Enables scrolling within the sidebar if content overflows */
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Optional: Adds a subtle shadow */
-}
-
-/* Adjust the main content to account for the fixed sidebar */
-.main-content {
-    margin-left: 250px; /* Same as the sidebar's width */
-    padding: 20px;      /* Add padding to the main content */
-}
-
-
 .main-content {
     background: var(--neutral-100);
     padding: 2rem;
@@ -115,8 +94,8 @@
 }
 
 .status-approved { background: #dcfce7; color: #15803d; }
-.status-planned { background: #fef3c7; color: #b45309; }
-.status-unwanted { background: #fee2e2; color: #b91c1c; }
+.status-pending { background: #fef3c7; color: #b45309; }
+.status-rejected { background: #fee2e2; color: #b91c1c; }
 
 .summary-card {
     display: grid;
