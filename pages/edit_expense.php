@@ -23,20 +23,20 @@ $amount = $_POST['amount'] ?? null; // Updated amount
 $status = $_POST['status'] ?? null; // Updated Status
 
 // Validate that all required fields are present
-if (!$id || !$date || !$category || !$description || !$amount) {
+if (!$id || !$date || !$category || !$description || !$amount) || !$status) {
     echo json_encode(['error' => 'All fields are required.']);
     exit();
 }
 
 // Prepare the SQL query to update the expense in the database
-$stmt = $conn->prepare("UPDATE expenses SET date = ?, category = ?, description = ?, amount = ? WHERE id = ?");
+$stmt = $conn->prepare("UPDATE expenses SET date = ?, category = ?, description = ?, amount = ?, status = ?, WHERE id = ?");
 if (!$stmt) {
     echo json_encode(['error' => 'Database error: ' . $conn->error]); // Respond with an error if the statement preparation fails
     exit();
 }
 
 // Bind the parameters to the SQL query
-$stmt->bind_param("sssdi", $date, $category, $description, $amount, $id);
+$stmt->bind_param("sssdi", $date, $category, $description, $amount, $status, $id);
 
 // Execute the query and check if it was successful
 if ($stmt->execute()) {
