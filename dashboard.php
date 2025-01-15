@@ -251,7 +251,7 @@ $conn->close();
     <div class="modal-content">
         <h2 class="text-xl font-bold mb-4">Edit Expense</h2>
         <!-- Edit Expense Form -->
-        <form id="editExpenseForm" onsubmit="updateExpense(event)">
+        <form id="editExpenseForm" onsubmit="submitEditExpense(event)"> <!-- Changed from updateExpense to submitEditExpense -->
             <input type="hidden" id="editExpenseId"> <!-- Hidden field for expense ID -->
             <div class="form-group">
                 <label for="editDate">Date</label>

@@ -119,36 +119,28 @@ function recalculateTotals() {
 
 // Update form submission handler to include status
 async function addExpense(event) {
-    event.preventDefault(); // Prevent the form from submitting normally (page reload)
+    event.preventDefault();
+    console.log('Adding expense...');
 
-    // Collect the form data
     const formData = {
-        date: document.getElementById('date').value, // Selected expense date
-        category: document.getElementById('category').value, // Selected category
-        description: document.getElementById('description').value, // Expense description
-        amount: parseFloat(document.getElementById('amount').value), // Expense amount as a number
-        status: document.getElementById('status').value // Expense status
+        date: document.getElementById('date').value,
+        category: document.getElementById('category').value,
+        description: document.getElementById('description').value,
+        amount: parseFloat(document.getElementById('amount').value),
+        status: document.getElementById('status').value
     };
 
-    console.log('Form Data:', formData); // Add this line to log form data
-
-    // Send the data to the backend using a POST request
     try {
         const response = await fetch('pages/add_expense.php', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, // Set the content type
-            body: new URLSearchParams(formData) // Convert form data to URL-encoded format
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams(formData)
         });
 
-        // Parse the JSON response from the backend
         const result = await response.json();
-        console.log('Backend Response:', result); // Add this line to log backend response
+        console.log('Add result:', result);
 
         if (result.success) {
-            // Display a success toast notification
-            showToast(result.success, 'success');
-
-            // Add the new expense to the expense table dynamically
             const tableBody = document.querySelector('.data-table tbody');
             const row = `
                 <tr data-id="${result.id}">
@@ -158,29 +150,84 @@ async function addExpense(event) {
                     <td>₹${formData.amount.toFixed(2)}</td>
                     <td><span class="status-badge status-${formData.status.toLowerCase()}">${formData.status}</span></td>
                     <td>
-                        <!-- Add buttons for editing and deleting the expense -->
                         <button class="text-blue-600 hover:text-blue-700" onclick="editExpense(this, '${result.id}')">Edit</button>
                         <button class="text-red-600 hover:text-red-700" onclick="deleteExpense(this)">Delete</button>
                     </td>
                 </tr>
             `;
-            tableBody.insertAdjacentHTML('afterbegin', row); // Insert the row at the beginning of the table
-
-            // Recalculate all totals and update UI
-            recalculateTotals();
-
-            // Reset the form and close the modal
+            tableBody.insertAdjacentHTML('afterbegin', row);
+            
+            // Reset form and close modal
             document.getElementById('expenseForm').reset();
             hideModal('addExpenseModal');
+            
+            // Update stats and charts
+            recalculateTotals();
+            showToast('Expense added successfully');
         } else {
-            // Display an error toast notification if the backend returns an error
-            showToast(result.error, 'error');
+            showToast(result.error || 'Failed to add expense', 'error');
         }
     } catch (error) {
-        // Handle any network or backend errors
-        console.error('Error:', error); // Add this line to log errors
-        showToast('Failed to add expense. Please try again.', 'error');
+        console.error('Error:', error);
+        showToast('Failed to add expense', 'error');
     }
+}
+
+async function submitEditExpense(event) {
+    event.preventDefault();
+    console.log('Submitting edit...');
+
+    const formData = {
+        id: document.getElementById('editExpenseId').value,
+        date: document.getElementById('editDate').value,
+        category: document.getElementById('editCategory').value,
+        description: document.getElementById('editDescription').value,
+        amount: document.getElementById('editAmount').value,
+        status: document.getElementById('editStatus').value
+    };
+
+    try {
+        const response = await fetch('pages/edit_expense.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams(formData)
+        });
+
+        const result = await response.json();
+        console.log('Edit result:', result);
+
+        if (result.success) {
+            const row = document.querySelector(`tr[data-id="${formData.id}"]`);
+            if (row) {
+                row.children[0].textContent = formData.date;
+                row.children[1].textContent = formData.category;
+                row.children[2].textContent = formData.description;
+                row.children[3].textContent = `₹${parseFloat(formData.amount).toFixed(2)}`;
+                
+                const statusBadge = row.children[4].querySelector('.status-badge');
+                statusBadge.textContent = formData.status;
+                statusBadge.className = `status-badge status-${formData.status.toLowerCase()}`;
+            }
+
+            // Reset form and close modal
+            document.getElementById('editExpenseForm').reset();
+            hideModal('editExpenseModal');
+            
+            // Update stats and charts
+            recalculateTotals();
+            showToast('Expense updated successfully');
+        } else {
+            showToast(result.error || 'Failed to update expense', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showToast('Failed to update expense', 'error');
+    }
+}
+
+// Add this showToast function if not already present
+function showToast(message, type = 'success') {
+    alert(message); // Simple alert - replace with better toast implementation if needed
 }
 
 function deleteExpense(button) {
@@ -243,7 +290,15 @@ function showModal(modalId) {
 }
 
 function hideModal(modalId) {
-    document.getElementById(modalId).style.display = 'none';
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'none';
+        // Reset the corresponding form
+        const form = modal.querySelector('form');
+        if (form) {
+            form.reset();
+        }
+    }
 }
 
 function setActiveNav(element, sectionId) {
