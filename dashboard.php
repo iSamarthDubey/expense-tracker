@@ -32,7 +32,7 @@ $expenseStmt->close();
 // Calculate summary data
 $totalExpenses = 0;
 $monthlyExpenses = 0;
-$pendingCount = 0;
+$plannedCount = 0;
 $categories = [];
 $currentMonth = date('Y-m');
 
@@ -41,13 +41,23 @@ foreach ($expenses as $expense) {
     if (strpos($expense['date'], $currentMonth) === 0) {
         $monthlyExpenses += $expense['amount'];
     }
-    if ($expense['status'] === 'Pending') {
-        $pendingCount++;
+    if ($expense['status'] === 'Planned') {
+        $plannedCount++;
+        error_log("Found Planned expense: " . json_encode($expense)); // Debug log
     }
     if (!isset($categories[$expense['category']])) {
         $categories[$expense['category']] = 0;
     }
     $categories[$expense['category']] += $expense['amount'];
+}
+
+error_log("Initial Planned Count: " . $plannedCount); // Debug log
+
+// Calculate monthly totals for the chart
+$monthlyTotals = array_fill(0, 12, 0);
+foreach ($expenses as $expense) {
+    $month = (int)date('m', strtotime($expense['date'])) - 1;
+    $monthlyTotals[$month] += $expense['amount'];
 }
 
 $conn->close();
@@ -92,8 +102,8 @@ $conn->close();
                     <div class="summary-value">₹<?php echo number_format($monthlyExpenses, 2); ?></div>
                 </div>
                 <div class="card">
-                    <div>Pending</div>
-                    <div class="summary-value"><?php echo $pendingCount; ?></div>
+                    <div>Planned</div> <!-- Changed from 'Pending' to 'Planned' -->
+                    <div class="summary-value"><?php echo $plannedCount; ?></div> <!-- Changed from $pendingCount to $plannedCount -->
                 </div>
                 <div class="card">
                     <div>Categories</div>
@@ -124,6 +134,7 @@ $conn->close();
             </div>
             
             <!------ Expense Table ----->
+
             <!-- Recent Expenses Table -->
             <div class="card">
                 <h3 class="text-lg font-medium mb-4">Recent Expenses</h3>
@@ -166,7 +177,17 @@ $conn->close();
         </main>
     </div>
 
-
+    <?php
+    // Add initialData to the page for JavaScript
+    ?>
+    <input type="hidden" id="initialData" value="<?php echo htmlspecialchars(json_encode([
+        'totalExpenses' => $totalExpenses,
+        'monthlyExpenses' => $monthlyExpenses,
+        'plannedCount' => $plannedCount, // Changed from 'pendingCount' to 'plannedCount'
+        'categories' => $categories,
+        'monthlyTotals' => array_values($monthlyTotals),
+        'expenses' => $expenses
+    ]), ENT_QUOTES, 'UTF-8'); ?>">
 
     <!--- Modals (Add and Edit Expense) --->
     

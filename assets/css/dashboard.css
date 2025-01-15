@@ -94,8 +94,8 @@
 }
 
 .status-approved { background: #dcfce7; color: #15803d; }
-.status-pending { background: #fef3c7; color: #b45309; }
-.status-rejected { background: #fee2e2; color: #b91c1c; }
+.status-planned { background: #fef3c7; color: #b45309; }
+.status-unwanted { background: #fee2e2; color: #b91c1c; }
 
 .summary-card {
     display: grid;

@@ -1,19 +1,21 @@
-let expenses = [];
+// Move initialData declaration before its usage
+const initialData = JSON.parse(document.getElementById('initialData').value);
+console.log('Initial Data:', initialData); // Add this line to log initial data
+
+// Update variables with initial data
+let totalExpenses = initialData.totalExpenses;
+let monthlyExpenses = initialData.monthlyExpenses;
+let plannedCount = initialData.plannedCount; // Changed from 'pendingCount' to 'plannedCount'
+let expenses = initialData.expenses || [];
 let expenseChart, categoryChart;
 
-// Initialize data
 const chartData = {
-    expenses: [10, 100, 1000, 10000, 10000],
-    categories: {
-        'Travel': 10,
-        'Office': 10,
-        'Meals': 10,
-        'Utilities': 10,
-        'Others': 10
-    }
+    expenses: initialData.monthlyTotals,
+    categories: initialData.categories
 };
 
 function initializeCharts() {
+    console.log('Initializing Charts with Data:', chartData); // Add this line to log chart data
     const trendCtx = document.getElementById('trendChart').getContext('2d');
     expenseChart = new Chart(trendCtx, {
         type: 'line',
@@ -60,6 +62,7 @@ function updateCharts(amount, category) {
     categoryChart.update();
 }
 
+// Update form submission handler to include status
 async function addExpense(event) {
     event.preventDefault(); // Prevent the form from submitting normally (page reload)
 
@@ -68,8 +71,11 @@ async function addExpense(event) {
         date: document.getElementById('date').value, // Selected expense date
         category: document.getElementById('category').value, // Selected category
         description: document.getElementById('description').value, // Expense description
-        amount: parseFloat(document.getElementById('amount').value) // Expense amount as a number
+        amount: parseFloat(document.getElementById('amount').value), // Expense amount as a number
+        status: document.getElementById('status').value // Expense status
     };
+
+    console.log('Form Data:', formData); // Add this line to log form data
 
     // Send the data to the backend using a POST request
     try {
@@ -81,6 +87,7 @@ async function addExpense(event) {
 
         // Parse the JSON response from the backend
         const result = await response.json();
+        console.log('Backend Response:', result); // Add this line to log backend response
 
         if (result.success) {
             // Display a success toast notification
@@ -94,10 +101,10 @@ async function addExpense(event) {
                     <td>${formData.category}</td>
                     <td>${formData.description}</td>
                     <td>₹${formData.amount.toFixed(2)}</td>
-                    <td><span class="status-badge status-pending">Pending</span></td>
+                    <td><span class="status-badge status-${formData.status.toLowerCase()}">${formData.status}</span></td>
                     <td>
                         <!-- Add buttons for editing and deleting the expense -->
-                        <button class="text-blue-600 hover:text-blue-700" onclick="editExpense(this)">Edit</button>
+                        <button class="text-blue-600 hover:text-blue-700" onclick="editExpense(this, '${result.id}')">Edit</button>
                         <button class="text-red-600 hover:text-red-700" onclick="deleteExpense(this)">Delete</button>
                     </td>
                 </tr>
@@ -107,7 +114,9 @@ async function addExpense(event) {
             // Update stats and charts
             totalExpenses += formData.amount; // Update total expenses
             monthlyExpenses += formData.amount; // Update monthly expenses
-            pendingCount++; // Increase the count of pending expenses
+            if (formData.status === 'Planned') {
+                plannedCount++; // Increase the count of planned expenses
+            }
             updateStats(); // Refresh summary stats
             updateCharts(formData.amount, formData.category); // Update the charts
 
@@ -120,6 +129,7 @@ async function addExpense(event) {
         }
     } catch (error) {
         // Handle any network or backend errors
+        console.error('Error:', error); // Add this line to log errors
         showToast('Failed to add expense. Please try again.', 'error');
     }
 }
@@ -139,8 +149,8 @@ function deleteExpense(button) {
     // Update stats
     totalExpenses -= amount;
     monthlyExpenses -= amount;
-    if (status === 'Pending') {
-        pendingCount--;
+    if (status === 'Planned') {
+        plannedCount--;
     }
     updateStats();
 
@@ -152,33 +162,53 @@ function deleteExpense(button) {
     row.remove();
 }
 
+// Fix status badges class names
 function changeStatus(button) {
     const statuses = ['Planned', 'Approved', 'Unwanted'];
     const row = button.closest('tr');
     const statusBadge = row.querySelector('.status-badge');
-    const currentStatus = statusBadge.textContent;
-    const currentIndex = statuses.indexOf(currentStatus);
+    const oldStatus = statusBadge.textContent;
+    const currentIndex = statuses.indexOf(oldStatus);
     const newStatus = statuses[(currentIndex + 1) % statuses.length];
     
-    // Update pending count
-    if (currentStatus === 'Planned') pendingCount--;
-    if (newStatus === 'Planned') pendingCount++;
+    // Update planned count based on status change
+    if (oldStatus === 'Planned') {
+        plannedCount--;
+    }
+    if (newStatus === 'Planned') {
+        plannedCount++;
+    }
     
-    // Update badge
     statusBadge.className = `status-badge status-${newStatus.toLowerCase()}`;
     statusBadge.textContent = newStatus;
+    
+    console.log('Status Changed:', {
+        from: oldStatus,
+        to: newStatus,
+        plannedCount
+    });
     
     updateStats();
 }
 
 function updateStats() {
-    // Update summary cards
-    document.querySelector('.summary-card:nth-child(1) .summary-value').textContent = 
+    // Log the current state
+    console.log('Updating Stats:', {
+        totalExpenses,
+        monthlyExpenses,
+        plannedCount,
+        categories: chartData.categories
+    });
+
+    // Update summary cards using the correct selectors
+    document.querySelector('.card:nth-child(1) .summary-value').textContent = 
         `₹${totalExpenses.toLocaleString()}`;
-    document.querySelector('.summary-card:nth-child(2) .summary-value').textContent = 
+    document.querySelector('.card:nth-child(2) .summary-value').textContent = 
         `₹${monthlyExpenses.toLocaleString()}`;
-    document.querySelector('.summary-card:nth-child(3) .summary-value').textContent = 
-        pendingCount.toString();
+    document.querySelector('.card:nth-child(3) .summary-value').textContent = 
+        plannedCount.toString();
+    document.querySelector('.card:nth-child(4) .summary-value').textContent = 
+        Object.keys(chartData.categories).length.toString();
 }
 
 function showModal(modalId) {
@@ -210,7 +240,8 @@ function editExpense(button, expenseId) {
     document.getElementById('editDate').value = row.children[0].textContent.trim(); // Fill the date
     document.getElementById('editCategory').value = row.children[1].textContent.trim(); // Fill the category
     document.getElementById('editDescription').value = row.children[2].textContent.trim(); // Fill the description
-    document.getElementById('editAmount').value = parseFloat(row.children[3].textContent.replace('$', '')); // Fill the amount
+    document.getElementById('editAmount').value = parseFloat(row.children[3].textContent.replace('₹', '')); // Fill the amount
+    document.getElementById('editStatus').value = row.children[4].textContent.trim(); // Fill the status
 
     // Display the Edit Expense modal
     showModal('editExpenseModal');
@@ -230,7 +261,8 @@ async function submitEditExpense(event) {
         date: document.getElementById('editDate').value, // Updated date of the expense
         category: document.getElementById('editCategory').value, // Updated category of the expense
         description: document.getElementById('editDescription').value, // Updated description of the expense
-        amount: parseFloat(document.getElementById('editAmount').value) // Updated amount of the expense
+        amount: parseFloat(document.getElementById('editAmount').value), // Updated amount of the expense
+        status: document.getElementById('editStatus').value // Updated status of the expense
     };
 
     try {
@@ -258,6 +290,21 @@ async function submitEditExpense(event) {
                     row.children[1].textContent = formData.category; // Update the category
                     row.children[2].textContent = formData.description; // Update the description
                     row.children[3].textContent = `₹${formData.amount.toFixed(2)}`; // Update the amount
+                    const oldStatus = row.children[4].querySelector('.status-badge').textContent;
+        
+                    // Update planned count when status changes
+                    if (oldStatus === 'Planned' && formData.status !== 'Planned') {
+                        plannedCount--;
+                    } else if (oldStatus !== 'Planned' && formData.status === 'Planned') {
+                        plannedCount++;
+                    }
+                    
+                    // Update the row content
+                    row.children[4].querySelector('.status-badge').textContent = formData.status;
+                    row.children[4].querySelector('.status-badge').className = 
+                        `status-badge status-${formData.status.toLowerCase()}`;
+                        
+                    updateStats();
                 }
             });
 
@@ -314,8 +361,8 @@ async function loadOverviewData() {
         // Update the This Month Expenses card
         document.getElementById('monthly-expenses').innerText = `$${data.summary.monthly_expenses}`;
 
-        // Update the Pending card
-        document.getElementById('pending').innerText = data.summary.pending;
+        // Update the Planned card
+        document.getElementById('planned').innerText = data.summary.planned;
 
         // Update the Categories card
         document.getElementById('categories').innerText = data.summary.categories;
