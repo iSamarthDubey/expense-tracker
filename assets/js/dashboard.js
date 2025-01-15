@@ -94,7 +94,7 @@ async function addExpense(event) {
                     <td>${formData.category}</td>
                     <td>${formData.description}</td>
                     <td>₹${formData.amount.toFixed(2)}</td>
-                    <td><span class="status-badge status-planned">Planned</span></td>
+                    <td><span class="status-badge status-pending">Pending</span></td>
                     <td>
                         <!-- Add buttons for editing and deleting the expense -->
                         <button class="text-blue-600 hover:text-blue-700" onclick="editExpense(this)">Edit</button>

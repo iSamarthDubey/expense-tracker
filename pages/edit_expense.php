@@ -23,7 +23,7 @@ $amount = $_POST['amount'] ?? null; // Updated amount
 $status = $_POST['status'] ?? null; // Updated Status
 
 // Validate that all required fields are present
-if (!$id || !$date || !$category || !$description || !$amount || !$status) {
+if (!$id || !$date || !$category || !$description || !$amount) || !$status) {
     echo json_encode(['error' => 'All fields are required.']);
     exit();
 }
