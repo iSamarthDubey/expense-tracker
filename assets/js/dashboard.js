@@ -230,10 +230,34 @@ function showToast(message, type = 'success') {
     alert(message); // Simple alert - replace with better toast implementation if needed
 }
 
-function deleteExpense(button) {
+async function deleteExpense(button) {
+    if (!confirm('Are you sure you want to delete this expense?')) {
+        return;
+    }
+
     const row = button.closest('tr');
-    row.remove();
-    recalculateTotals();
+    const expenseId = row.getAttribute('data-id');
+
+    try {
+        const response = await fetch('pages/delete_expense.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ id: expenseId })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            row.remove();
+            recalculateTotals();
+            showToast('Expense deleted successfully');
+        } else {
+            showToast(result.error || 'Failed to delete expense', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showToast('Failed to delete expense', 'error');
+    }
 }
 
 // Fix status badges class names
