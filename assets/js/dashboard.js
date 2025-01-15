@@ -62,6 +62,61 @@ function updateCharts(amount, category) {
     categoryChart.update();
 }
 
+// Add this new function to recalculate all totals
+function recalculateTotals() {
+    const rows = document.querySelectorAll('.data-table tbody tr');
+    
+    // Reset all counters
+    totalExpenses = 0;
+    monthlyExpenses = 0;
+    plannedCount = 0;
+    const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
+    
+    // Reset category totals
+    Object.keys(chartData.categories).forEach(key => {
+        chartData.categories[key] = 0;
+    });
+
+    // Reset monthly totals
+    chartData.expenses = Array(12).fill(0);
+
+    // Recalculate from current table data
+    rows.forEach(row => {
+        const amount = parseFloat(row.children[3].textContent.replace('₹', ''));
+        const category = row.children[1].textContent.trim();
+        const status = row.children[4].querySelector('.status-badge').textContent;
+        const date = row.children[0].textContent.trim();
+        
+        // Update totals
+        totalExpenses += amount;
+        
+        // Update monthly expenses
+        if (date.startsWith(currentMonth)) {
+            monthlyExpenses += amount;
+        }
+        
+        // Update planned count
+        if (status === 'Planned') {
+            plannedCount++;
+        }
+        
+        // Update category totals
+        if (!chartData.categories[category]) {
+            chartData.categories[category] = 0;
+        }
+        chartData.categories[category] += amount;
+        
+        // Update monthly trend
+        const month = new Date(date).getMonth();
+        chartData.expenses[month] += amount;
+    });
+
+    // Update UI
+    updateStats();
+    expenseChart.update();
+    categoryChart.update();
+}
+
 // Update form submission handler to include status
 async function addExpense(event) {
     event.preventDefault(); // Prevent the form from submitting normally (page reload)
@@ -96,7 +151,7 @@ async function addExpense(event) {
             // Add the new expense to the expense table dynamically
             const tableBody = document.querySelector('.data-table tbody');
             const row = `
-                <tr>
+                <tr data-id="${result.id}">
                     <td>${formData.date}</td>
                     <td>${formData.category}</td>
                     <td>${formData.description}</td>
@@ -111,14 +166,8 @@ async function addExpense(event) {
             `;
             tableBody.insertAdjacentHTML('afterbegin', row); // Insert the row at the beginning of the table
 
-            // Update stats and charts
-            totalExpenses += formData.amount; // Update total expenses
-            monthlyExpenses += formData.amount; // Update monthly expenses
-            if (formData.status === 'Planned') {
-                plannedCount++; // Increase the count of planned expenses
-            }
-            updateStats(); // Refresh summary stats
-            updateCharts(formData.amount, formData.category); // Update the charts
+            // Recalculate all totals and update UI
+            recalculateTotals();
 
             // Reset the form and close the modal
             document.getElementById('expenseForm').reset();
@@ -136,30 +185,8 @@ async function addExpense(event) {
 
 function deleteExpense(button) {
     const row = button.closest('tr');
-    const amount = parseFloat(row.querySelector('td:nth-child(4)').textContent.replace('₹', ''));
-    const category = row.querySelector('td:nth-child(2)').textContent;
-    const status = row.querySelector('.status-badge').textContent;
-
-    // Update charts
-    chartData.expenses[chartData.expenses.length - 1] -= amount;
-    chartData.categories[category] -= amount;
-    expenseChart.update();
-    categoryChart.update();
-
-    // Update stats
-    totalExpenses -= amount;
-    monthlyExpenses -= amount;
-    if (status === 'Planned') {
-        plannedCount--;
-    }
-    updateStats();
-
-    // Remove from expenses array
-    const index = Array.from(row.parentNode.children).indexOf(row);
-    expenses.splice(index, 1);
-
-    // Remove row
     row.remove();
+    recalculateTotals();
 }
 
 // Fix status badges class names
@@ -311,6 +338,9 @@ async function submitEditExpense(event) {
             // Optionally, refresh the charts and stats dynamically after editing
             updateStats(); // Recalculate and display updated summary stats
             updateCharts(formData.amount, formData.category); // Update the charts with the edited data
+
+            // Recalculate all totals and update UI
+            recalculateTotals();
 
             // Close the Edit Expense modal
             hideModal('editExpenseModal');

@@ -138,7 +138,7 @@ $conn->close();
             <!-- Recent Expenses Table -->
             <div class="card">
                 <h3 class="text-lg font-medium mb-4">Recent Expenses</h3>
-                <table class="table-auto w-full">
+                <table class="table-auto w-full data-table"> <!-- Added data-table class -->
                     <thead>
                         <tr>
                             <th>Date</th>
