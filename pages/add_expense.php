@@ -17,16 +17,17 @@ $date = $_POST['date'] ?? null;
 $category = $_POST['category'] ?? null;
 $description = $_POST['description'] ?? null;
 $amount = $_POST['amount'] ?? null;
+$status = $_POST['status'] ?? null;
 
 // Validate the inputs
-if (!$date || !$category || !$description || !$amount) {
+if (!$date || !$category || !$description || !$amount) || !$status) {
     echo json_encode(['error' => 'All fields are required.']);
     exit();
 }
 
 // Insert the new expense into the database
-$stmt = $conn->prepare("INSERT INTO expenses (user_id, date, category, description, amount, status) VALUES (?, ?, ?, ?, ?, 'Pending')");
-$stmt->bind_param("isssd", $userId, $date, $category, $description, $amount);
+$stmt = $conn->prepare("INSERT INTO expenses (user_id, date, category, description, amount, status) VALUES (?, ?, ?, ?, ?, 'Approved')");
+$stmt->bind_param("isssd", $userId, $date, $category, $description, $amount, $status);
 
 if ($stmt->execute()) {
     echo json_encode(['success' => 'Expense added successfully']); // Respond with success
