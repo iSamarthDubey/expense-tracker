@@ -72,8 +72,7 @@ CREATE TABLE IF NOT EXISTS expenses (
 
 ### 4. Configure the Project
 
-1. Open the `config.php` file in the root directory of the project.
-2. Update the database configuration to match your local setup:
+Update the database configuration to match your local setup:
    ```php
    <?php
    $servername = "localhost";
