@@ -20,6 +20,7 @@ $date = $_POST['date'] ?? null; // Updated date of the expense
 $category = $_POST['category'] ?? null; // Updated category
 $description = $_POST['description'] ?? null; // Updated description
 $amount = $_POST['amount'] ?? null; // Updated amount
+$status = $_POST['status'] ?? null; // Updated Status
 
 // Validate that all required fields are present
 if (!$id || !$date || !$category || !$description || !$amount) {
