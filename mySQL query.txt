@@ -20,6 +20,6 @@ CREATE TABLE IF NOT EXISTS expenses (
     category VARCHAR(255) NOT NULL,
     description VARCHAR(255) NOT NULL,
     amount DECIMAL(10,2) NOT NULL,
-    status ENUM('Approved', 'Pending', 'Rejected') NOT NULL,
+    status ENUM('Approved', 'Planned', 'Unwanted') NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
