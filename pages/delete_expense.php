@@ -3,6 +3,7 @@ session_start();
 header('Content-Type: application/json');
 include('../includes/db_connect.php');
 
+// Check authentication
 if (!isset($_SESSION['user'])) {
     echo json_encode(['error' => 'Unauthorized']);
     exit();
