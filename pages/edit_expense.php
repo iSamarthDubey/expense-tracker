@@ -14,6 +14,8 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 
+$user_id = $_SESSION['user'];
+
 // Retrieve the form data sent via POST request
 $id = $_POST['id'] ?? null; // Expense ID to edit
 $date = $_POST['date'] ?? null; // Updated date of the expense
@@ -28,24 +30,36 @@ if (!$id || !$date || !$category || !$description || !$amount || !$status) {
     exit();
 }
 
+// First verify the expense belongs to the user
+$checkStmt = $conn->prepare("SELECT id FROM expenses WHERE id = ? AND user_id = ?");
+$checkStmt->bind_param("ii", $id, $user_id);
+$checkStmt->execute();
+$result = $checkStmt->get_result();
+
+if ($result->num_rows === 0) {
+    echo json_encode(['error' => 'Expense not found or unauthorized']);
+    exit();
+}
+$checkStmt->close();
+
 // Prepare the SQL query to update the expense in the database
-$stmt = $conn->prepare("UPDATE expenses SET date = ?, category = ?, description = ?, amount = ?, status = ? WHERE id = ?");
-if (!$stmt) {
+$updateStmt = $conn->prepare("UPDATE expenses SET date = ?, category = ?, description = ?, amount = ?, status = ? WHERE id = ? AND user_id = ?");
+if (!$updateStmt) {
     echo json_encode(['error' => 'Database error: ' . $conn->error]); // Respond with an error if the statement preparation fails
     exit();
 }
 
 // Bind the parameters to the SQL query
-$stmt->bind_param("sssdis", $date, $category, $description, $amount, $status, $id);
+$updateStmt->bind_param("sssdsii", $date, $category, $description, $amount, $status, $id, $user_id);
 
 // Execute the query and check if it was successful
-if ($stmt->execute()) {
+if ($updateStmt->execute()) {
     echo json_encode(['success' => 'Expense updated successfully']); // Respond with success message
 } else {
-    echo json_encode(['error' => 'Error updating expense: ' . $stmt->error]); // Respond with an error if the execution fails
+    echo json_encode(['error' => 'Error updating expense: ' . $updateStmt->error]); // Respond with an error if the execution fails
 }
 
 // Close the statement and database connection
-$stmt->close();
+$updateStmt->close();
 $conn->close();
 ?>
