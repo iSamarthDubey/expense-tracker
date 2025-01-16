@@ -84,8 +84,8 @@ function updatePasswordStrength(password) {
 }
 
 // Event listeners for password input fields: Handles real-time password validation
-const regPassword = document.getElementById('regPassword'); // Get the password input for registration
-const regConfirmPassword = document.getElementById('regConfirmPassword'); // Get the confirm password input
+const regPassword = document.getElementById('registerPassword'); // Get the password input for registration
+const regConfirmPassword = document.getElementById('registerConfirmPassword'); // Get the confirm password input
 regPassword.addEventListener('input', () => updatePasswordStrength(regPassword.value)); // Listen for password input change
 regConfirmPassword.addEventListener('input', () => {
     // Validate if confirm password matches the original password
@@ -100,10 +100,10 @@ regConfirmPassword.addEventListener('input', () => {
 document.getElementById('registerForm').addEventListener('submit', async function (event) {
     event.preventDefault(); // Prevent default submission for AJAX handling
 
-    const name = document.getElementById('regName').value;
-    const email = document.getElementById('regEmail').value;
-    const password = document.getElementById('regPassword').value;
-    const confirmPassword = document.getElementById('regConfirmPassword').value;
+    const name = document.getElementById('registerName').value;
+    const email = document.getElementById('registerEmail').value;
+    const password = document.getElementById('registerPassword').value;
+    const confirmPassword = document.getElementById('registerConfirmPassword').value;
 
     // Validate inputs
     if (!validateEmail(email)) {

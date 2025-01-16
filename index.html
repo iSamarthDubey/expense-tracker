@@ -56,88 +56,88 @@
                 </div>
 
                 <!-- Login form -->
-<form id="loginForm" method="POST" action="pages/login.php">
-    <div class="form-group">
-        <label for="loginEmail">Email</label>
-        <div class="input-wrapper">
-            <i>📧</i> 
-            <input type="email" id="loginEmail" name="email" class="form-control" required> 
-        </div>
-        <div class="error-message"></div>
-    </div>
+                <form id="loginForm" method="POST" action="pages/login.php">
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <div class="input-wrapper">
+                            <i>📧</i> 
+                            <input type="email" id="loginEmail" name="email" class="form-control" required> 
+                        </div>
+                        <div class="error-message"></div>
+                    </div>
 
-    <div class="form-group">
-        <label for="loginPassword">Password</label>
-        <div class="input-wrapper">
-            <i>🔒</i>
-            <input type="password" id="loginPassword" name="password" class="form-control" required>
-            <button type="button" class="password-toggle" onclick="togglePassword('loginPassword')">👁️</button>
-        </div>
-        <div class="error-message"></div>
-    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <div class="input-wrapper">
+                            <i>🔒</i>
+                            <input type="password" id="loginPassword" name="password" class="form-control" required>
+                            <button type="button" class="password-toggle" onclick="togglePassword('loginPassword')">👁️</button>
+                        </div>
+                        <div class="error-message"></div>
+                    </div>
 
-    <!-- Submit button for login (PHP handles the redirect) -->
-    <button type="submit" class="submit-btn">Sign In</button>
+                    <!-- Submit button for login (PHP handles the redirect) -->
+                    <button type="submit" class="submit-btn">Sign In</button>
 
-    <!-- Social login options -->
-    <div class="social-login">
-        <div class="social-btn" onclick="socialLogin('google')">
-            <img src="api/placeholder" alt="Google">
-            Continue with Google
-        </div>
-        <div class="social-btn" onclick="socialLogin('microsoft')">
-            <img src="api/placeholder" alt="Microsoft">
-            Continue with Microsoft
-        </div>
-    </div>
-</form>
+                    <!-- Social login options -->
+                    <div class="social-login">
+                        <div class="social-btn" onclick="socialLogin('google')">
+                            <img src="api/placeholder" alt="Google">
+                            Continue with Google
+                        </div>
+                        <div class="social-btn" onclick="socialLogin('microsoft')">
+                            <img src="api/placeholder" alt="Microsoft">
+                            Continue with Microsoft
+                        </div>
+                    </div>
+                </form>
 
                 <!-- Register form -->
-<form id="registerForm" method="POST" action="pages/register.php" style="display: none;">
-    <div class="form-group">
-        <label for="regName">Full Name</label>
-        <div class="input-wrapper">
-            <i>👤</i> 
-            <input type="text" id="regName" name="name" class="form-control" required> 
-        </div>
-        <div class="error-message"></div>
-    </div>
+                <form id="registerForm" method="POST" action="pages/register.php" style="display: none;">
+                    <div class="form-group">
+                        <label for="registerName">Full Name</label>
+                        <div class="input-wrapper">
+                            <i>👤</i> 
+                            <input type="text" id="registerName" name="name" class="form-control" required> 
+                        </div>
+                        <div class="error-message"></div>
+                    </div>
 
-    <div class="form-group">
-        <label for="regEmail">Email</label>
-        <div class="input-wrapper">
-            <i>📧</i> 
-            <input type="email" id="regEmail" name="email" class="form-control" required> 
-        </div>
-        <div class="error-message"></div>
-    </div>
+                    <div class="form-group">
+                        <label for="registerEmail">Email</label>
+                        <div class="input-wrapper">
+                            <i>📧</i> 
+                            <input type="email" id="registerEmail" name="email" class="form-control" required> 
+                        </div>
+                        <div class="error-message"></div>
+                    </div>
 
-    <div class="form-group">
-        <label for="regPassword">Password</label>
-        <div class="input-wrapper">
-            <i>🔒</i> 
-            <input type="password" id="regPassword" name="password" class="form-control" required>
-            <button type="button" class="password-toggle" onclick="togglePassword('regPassword')">👁️</button>
-        </div>
-        <div class="error-message"></div>
-        <div class="password-strength">
-            <div class="password-strength-bar"></div>
-        </div>
-    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">Password</label>
+                        <div class="input-wrapper">
+                            <i>🔒</i> 
+                            <input type="password" id="registerPassword" name="password" class="form-control" required>
+                            <button type="button" class="password-toggle" onclick="togglePassword('registerPassword')">👁️</button>
+                        </div>
+                        <div class="error-message"></div>
+                        <div class="password-strength">
+                            <div class="password-strength-bar"></div>
+                        </div>
+                    </div>
 
-    <div class="form-group">
-        <label for="regConfirmPassword">Confirm Password</label>
-        <div class="input-wrapper">
-            <i>🔒</i>
-            <input type="password" id="regConfirmPassword" name="confirm_password" class="form-control" required>
-            <button type="button" class="password-toggle" onclick="togglePassword('regConfirmPassword')">👁️</button>
-        </div>
-        <div class="error-message"></div>
-    </div>
+                    <div class="form-group">
+                        <label for="registerConfirmPassword">Confirm Password</label>
+                        <div class="input-wrapper">
+                            <i>🔒</i>
+                            <input type="password" id="registerConfirmPassword" name="confirm_password" class="form-control" required>
+                            <button type="button" class="password-toggle" onclick="togglePassword('registerConfirmPassword')">👁️</button>
+                        </div>
+                        <div class="error-message"></div>
+                    </div>
 
-    <!-- Submit button for registration -->
-    <button type="submit" class="submit-btn">Create Account</button>
-</form>
+                    <!-- Submit button for registration -->
+                    <button type="submit" class="submit-btn">Create Account</button>
+                </form>
 
             </div>
         </section>
