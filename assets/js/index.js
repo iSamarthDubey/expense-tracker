@@ -83,104 +83,107 @@ function updatePasswordStrength(password) {
     }
 }
 
-// Event listeners for password input fields: Handles real-time password validation
-const regPassword = document.getElementById('registerPassword'); // Get the password input for registration
-const regConfirmPassword = document.getElementById('registerConfirmPassword'); // Get the confirm password input
-regPassword.addEventListener('input', () => updatePasswordStrength(regPassword.value)); // Listen for password input change
-regConfirmPassword.addEventListener('input', () => {
-    // Validate if confirm password matches the original password
-    if (regConfirmPassword.value !== regPassword.value) {
-        regConfirmPassword.setCustomValidity("Passwords don't match"); // Set error if passwords don't match
-    } else {
-        regConfirmPassword.setCustomValidity(""); // Clear error if passwords match
-    }
-});
-
-// Handle register form submission
-document.getElementById('registerForm').addEventListener('submit', async function (event) {
-    event.preventDefault(); // Prevent default submission for AJAX handling
-
-    const name = document.getElementById('registerName').value;
-    const email = document.getElementById('registerEmail').value;
-    const password = document.getElementById('registerPassword').value;
-    const confirmPassword = document.getElementById('registerConfirmPassword').value;
-
-    // Validate inputs
-    if (!validateEmail(email)) {
-        showToast('Invalid email address.', 'error');
-        return;
-    }
-    if (password !== confirmPassword) {
-        showToast('Passwords do not match.', 'error');
-        return;
-    }
-    if (validatePassword(password) < 3) {
-        showToast('Password is too weak.', 'error');
-        return;
-    }
-
-    // Submit the form using fetch
-    try {
-        const response = await fetch('pages/register.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ regName: name, regEmail: email, regPassword: password, regConfirmPassword: confirmPassword }),
-        });
-
-        if (response.ok) {
-            const result = await response.text();
-            showToast('Registration successful! Redirecting...', 'success');
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 3000);
+// Wait for the DOM to be fully loaded before adding event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Event listeners for password input fields: Handles real-time password validation
+    const regPassword = document.getElementById('registerPassword'); // Get the password input for registration
+    const regConfirmPassword = document.getElementById('registerConfirmPassword'); // Get the confirm password input
+    regPassword.addEventListener('input', () => updatePasswordStrength(regPassword.value)); // Listen for password input change
+    regConfirmPassword.addEventListener('input', () => {
+        // Validate if confirm password matches the original password
+        if (regConfirmPassword.value !== regPassword.value) {
+            regConfirmPassword.setCustomValidity("Passwords don't match"); // Set error if passwords don't match
         } else {
-            const error = await response.text();
-            showToast(error || 'Registration failed.', 'error');
+            regConfirmPassword.setCustomValidity(""); // Clear error if passwords match
         }
-    } catch (err) {
-        showToast('Error communicating with the server.', 'error');
-    }
-});
+    });
 
-// Handle login form submission
-document.getElementById('loginForm').addEventListener('submit', async function (event) {
-    event.preventDefault(); // Prevent default submission for AJAX handling
+    // Handle register form submission
+    document.getElementById('registerForm').addEventListener('submit', async function (event) {
+        event.preventDefault(); // Prevent default submission for AJAX handling
 
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
+        const name = document.getElementById('registerName').value;
+        const email = document.getElementById('registerEmail').value;
+        const password = document.getElementById('registerPassword').value;
+        const confirmPassword = document.getElementById('registerConfirmPassword').value;
 
-    // Validate inputs
-    if (!validateEmail(email)) {
-        showToast('Invalid email address.', 'error');
-        return;
-    }
-
-    try {
-        const response = await fetch('pages/login.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ email: email, password: password }),
-        });
-
-        if (response.ok) {
-            const result = await response.text();
-            showToast('Login successful! Redirecting...', 'success');
-            setTimeout(() => {
-                window.location.href = 'dashboard.php';
-            }, 3000);
-        } else {
-            const error = await response.text();
-            showToast(error || 'Login failed.', 'error');
+        // Validate inputs
+        if (!validateEmail(email)) {
+            showToast('Invalid email address.', 'error');
+            return;
         }
-    } catch (err) {
-        showToast('Error communicating with the server.', 'error');
-    }
+        if (password !== confirmPassword) {
+            showToast('Passwords do not match.', 'error');
+            return;
+        }
+        if (validatePassword(password) < 3) {
+            showToast('Password is too weak.', 'error');
+            return;
+        }
+
+        // Submit the form using fetch
+        try {
+            const response = await fetch('pages/register.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ regName: name, regEmail: email, regPassword: password, regConfirmPassword: confirmPassword }),
+            });
+
+            if (response.ok) {
+                const result = await response.text();
+                showToast('Registration successful! Redirecting...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 3000);
+            } else {
+                const error = await response.text();
+                showToast(error || 'Registration failed.', 'error');
+            }
+        } catch (err) {
+            showToast('Error communicating with the server.', 'error');
+        }
+    });
+
+    // Handle login form submission
+    document.getElementById('loginForm').addEventListener('submit', async function (event) {
+        event.preventDefault(); // Prevent default submission for AJAX handling
+
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+
+        // Validate inputs
+        if (!validateEmail(email)) {
+            showToast('Invalid email address.', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch('pages/login.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ email: email, password: password }),
+            });
+
+            if (response.ok) {
+                const result = await response.text();
+                showToast('Login successful! Redirecting...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'dashboard.php';
+                }, 3000);
+            } else {
+                const error = await response.text();
+                showToast(error || 'Login failed.', 'error');
+            }
+        } catch (err) {
+            showToast('Error communicating with the server.', 'error');
+        }
+    });
+
+    // Initial Tab: Set the initial tab to 'login'
+    switchTab('login');
 });
 
 // Social login function: Placeholder for social login functionality
 function socialLogin(provider) {
     showToast(`Continue with ${provider.charAt(0).toUpperCase() + provider.slice(1)}`, 'info'); // Show info toast for social login
 }
-
-// Initial Tab: Set the initial tab to 'login'
-switchTab('login');
