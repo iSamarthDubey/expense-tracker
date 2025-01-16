@@ -1,6 +1,10 @@
 <?php
 session_start();
 header('Content-Type: application/json'); // Ensure JSON responses
+header('Access-Control-Allow-Origin: *'); // Allow requests from any origin
+header('Access-Control-Allow-Methods: POST, GET, OPTIONS'); // Allow specific HTTP methods
+header('Access-Control-Allow-Headers: Content-Type'); // Allow specific headers
+
 include('../includes/db_connect.php'); // Include database connection
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {

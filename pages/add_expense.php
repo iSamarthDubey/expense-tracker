@@ -4,6 +4,9 @@ session_start();
 
 // Set the content type to JSON for proper API response
 header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *'); // Allow requests from any origin
+header('Access-Control-Allow-Methods: POST, GET, OPTIONS'); // Allow specific HTTP methods
+header('Access-Control-Allow-Headers: Content-Type'); // Allow specific headers
 
 // Include the database connection file
 include('../includes/db_connect.php');
