@@ -456,19 +456,30 @@ async function loadOverviewData() {
     try {
         // Fetch the data from the backend using the dashboard.php endpoint
         const response = await fetch('pages/dashboard.php', {
+            method: 'GET',
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}` // Authorization header with token
+                'Content-Type': 'application/json'
             }
         });
+
+        // Check if the response is OK
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
 
         // Parse the response as JSON
         const data = await response.json();
 
+        // Check if there is an error in the response
+        if (data.error) {
+            throw new Error(data.error);
+        }
+
         // Update the Total Expenses card
-        document.getElementById('total-expenses').innerText = `$${data.summary.total_expenses}`;
+        document.getElementById('total-expenses').innerText = `₹${data.summary.total_expenses}`;
 
         // Update the This Month Expenses card
-        document.getElementById('monthly-expenses').innerText = `$${data.summary.monthly_expenses}`;
+        document.getElementById('monthly-expenses').innerText = `₹${data.summary.monthly_expenses}`;
 
         // Update the Planned card
         document.getElementById('planned').innerText = data.summary.planned;
@@ -478,6 +489,7 @@ async function loadOverviewData() {
     } catch (error) {
         // Log an error if the data cannot be fetched
         console.error('Failed to load overview data:', error);
+        showToast('Failed to load overview data: ' + error.message, 'error');
     }
 }
 
