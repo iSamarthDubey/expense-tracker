@@ -120,56 +120,31 @@ function recalculateTotals() {
 // Update form submission handler to include status
 async function addExpense(event) {
     event.preventDefault();
-    console.log('Adding expense...');
 
-    const formData = {
-        date: document.getElementById('date').value,
-        category: document.getElementById('category').value,
-        description: document.getElementById('description').value,
-        amount: parseFloat(document.getElementById('amount').value),
-        status: document.getElementById('status').value
-    };
+    const date = document.getElementById('date').value;
+    const category = document.getElementById('category').value;
+    const description = document.getElementById('description').value;
+    const amount = document.getElementById('amount').value;
+    const status = document.getElementById('status').value;
 
     try {
         const response = await fetch('pages/add_expense.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams(formData)
+            body: new URLSearchParams({ date, category, description, amount, status }),
         });
 
         const result = await response.json();
-        console.log('Add result:', result);
-
-        if (result.success) {
-            const tableBody = document.querySelector('.data-table tbody');
-            const row = `
-                <tr data-id="${result.id}">
-                    <td>${formData.date}</td>
-                    <td>${formData.category}</td>
-                    <td>${formData.description}</td>
-                    <td>₹${formData.amount.toFixed(2)}</td>
-                    <td><span class="status-badge status-${formData.status.toLowerCase()}">${formData.status}</span></td>
-                    <td>
-                        <button class="text-blue-600 hover:text-blue-700" onclick="editExpense(this, '${result.id}')">Edit</button>
-                        <button class="text-red-600 hover:text-red-700" onclick="deleteExpense(this)">Delete</button>
-                    </td>
-                </tr>
-            `;
-            tableBody.insertAdjacentHTML('afterbegin', row);
-            
-            // Reset form and close modal
-            document.getElementById('expenseForm').reset();
-            hideModal('addExpenseModal');
-            
-            // Update stats and charts
-            recalculateTotals();
-            showToast('Expense added successfully');
+        if (response.ok) {
+            showToast(result.success, 'success');
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
         } else {
-            showToast(result.error || 'Failed to add expense', 'error');
+            showToast(result.error || 'Failed to add expense.', 'error');
         }
-    } catch (error) {
-        console.error('Error:', error);
-        showToast('Failed to add expense', 'error');
+    } catch (err) {
+        showToast('Error communicating with the server.', 'error');
     }
 }
 
