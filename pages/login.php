@@ -34,9 +34,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $stmt->bind_result($userId, $dbPassword);
     $stmt->fetch();
 
-    if (password_verify($password, $dbPassword)) {
-        $_SESSION['user'] = $userId; // Store user ID in session
-        echo json_encode(['success' => 'Login successful!']);
+    if ($dbPassword !== null) {
+        if (password_verify($password, $dbPassword)) {
+            $_SESSION['user'] = $userId; // Store user ID in session
+            echo json_encode(['success' => 'Login successful!']);
+        } else {
+            echo json_encode(['error' => 'Invalid email or password.']);
+        }
     } else {
         echo json_encode(['error' => 'Invalid email or password.']);
     }
