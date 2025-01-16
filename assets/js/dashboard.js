@@ -476,16 +476,28 @@ async function loadOverviewData() {
         }
 
         // Update the Total Expenses card
-        document.getElementById('total-expenses').innerText = `₹${data.summary.total_expenses}`;
+        const totalExpensesElement = document.getElementById('total-expenses');
+        if (totalExpensesElement) {
+            totalExpensesElement.innerText = `₹${data.summary.total_expenses}`;
+        }
 
         // Update the This Month Expenses card
-        document.getElementById('monthly-expenses').innerText = `₹${data.summary.monthly_expenses}`;
+        const monthlyExpensesElement = document.getElementById('monthly-expenses');
+        if (monthlyExpensesElement) {
+            monthlyExpensesElement.innerText = `₹${data.summary.monthly_expenses}`;
+        }
 
         // Update the Planned card
-        document.getElementById('planned').innerText = data.summary.planned;
+        const plannedElement = document.getElementById('planned');
+        if (plannedElement) {
+            plannedElement.innerText = data.summary.planned;
+        }
 
         // Update the Categories card
-        document.getElementById('categories').innerText = data.summary.categories;
+        const categoriesElement = document.getElementById('categories');
+        if (categoriesElement) {
+            categoriesElement.innerText = data.summary.categories;
+        }
     } catch (error) {
         // Log an error if the data cannot be fetched
         console.error('Failed to load overview data:', error);
