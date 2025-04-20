@@ -24,7 +24,8 @@ A simple web app to keep a track of expenses. Built using HTML, CSS, Javascript,
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/iSamarthDubey/expense-tracker.git && cd expense-tracker
+git clone https://github.com/iSamarthDubey/expense-tracker.git
+cd expense-tracker
 ```
 
 ### 2. Start the Local Server
